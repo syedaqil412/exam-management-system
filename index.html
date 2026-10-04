@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPTM Exam Portal Gateway</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .gateway-container { text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 600px; width: 90%; }
+        h1 { color: #0056b3; margin-bottom: 10px; font-size: 28px; }
+        p { color: #666; margin-bottom: 30px; }
+        .role-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media(min-width: 600px) { .role-grid { grid-template-columns: repeat(3, 1fr); } }
+        .role-card { background: #fafafa; border: 2px solid #eef0f2; padding: 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease-in-out; text-decoration: none; display: block; }
+        .role-card:hover { border-color: #0056b3; background: #f0f7ff; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,86,179,0.1); }
+        .role-icon { font-size: 40px; margin-bottom: 10px; display: block; }
+        .role-title { font-weight: bold; color: #333; font-size: 16px; display: block; margin-bottom: 5px; }
+        .role-desc { font-size: 12px; color: #777; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="gateway-container">
+        <h1>Universiti Poly-Tech Malaysia</h1>
+        <p>Exam Scheduling & Result Management System—Select Your Access Tier</p>
+        
+        <div class="role-grid">
+            <!-- Link Redirects Directly to Member 1's Separate Folder App -->
+            <a href="frontend-member1-admin/admin-portal.html" class="role-card">
+                <span class="role-icon">🔒</span>
+                <span class="role-title">Administrator</span>
+                <span class="role-desc">Manage schedules & system configurations</span>
+            </a>
+
+            <!-- Link Redirects Directly to Member 2's Separate Folder App -->
+            <a href="frontend-member2-lecturer/lecturer-view.html" class="role-card">
+                <span class="role-icon">👩‍🏫</span>
+                <span class="role-title">Lecturer</span>
+                <span class="role-desc">Input academic grades & review student logs</span>
+            </a>
+
+            <!-- Link Redirects Directly to Member 3's Separate Folder App -->
+            <a href="frontend-member3-student/student-slip.html" class="role-card">
+                <span class="role-icon">🎓</span>
+                <span class="role-title">Student</span>
+                <span class="role-desc">View performance results & download PDF slips</span>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

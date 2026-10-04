@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPTM Exam Portal Gateway - Cream Edition</title>
+    <style>
+        :root { --bg: #fef08a; --card: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --accent: #0ea5e9; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .gateway-container { text-align: center; background: var(--card); padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); max-width: 650px; width: 90%; border: 1px solid var(--border); }
+        h1 { color: #334155; margin-bottom: 10px; font-size: 30px; font-weight: 700; letter-spacing: -0.5px; }
+        p { color: var(--text-muted); margin-bottom: 35px; font-size: 15px; }
+        .role-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media(min-width: 600px) { .role-grid { grid-template-columns: repeat(3, 1fr); } }
+        .role-card { background: #fff; border: 1px solid var(--border); padding: 25px 15px; border-radius: 10px; cursor: pointer; transition: all 0.25s ease-in-out; text-decoration: none; display: block; }
+        .role-card:hover { border-color: var(--accent); background: #fffbeb; transform: translateY(-4px); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.12); }
+        .role-icon { font-size: 42px; margin-bottom: 12px; display: block; }
+        .role-title { font-weight: 600; color: #334155; font-size: 16px; display: block; margin-bottom: 6px; }
+        .role-desc { font-size: 12px; color: var(--text-muted); display: block; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <div class="gateway-container">
+        <h1>Universiti Poly-Tech Malaysia</h1>
+        <p>Exam Scheduling & Result Management System — Select Your Access Tier</p>
+        
+        <div class="role-grid">
+            <a href="frontend-member1-admin/admin-portal.html" class="role-card">
+                <span class="role-icon">🔒</span>
+                <span class="role-title">Administrator</span>
+                <span class="role-desc">Manage schedules & user account entries</span>
+            </a>
+
+            <a href="frontend-member2-lecturer/lecturer-view.html" class="role-card">
+                <span class="role-icon">👩‍🏫</span>
+                <span class="role-title">Lecturer</span>
+                <span class="role-desc">Input academic grades & review student logs</span>
+            </a>
+
+            <a href="frontend-member3-student/student-slip.html" class="role-card">
+                <span class="role-icon">🎓</span>
+                <span class="role-title">Student</span>
+                <span class="role-desc">View performance results & print PDF slips</span>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

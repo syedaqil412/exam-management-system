@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Exam & User Management</title>
+    <style>
+        :root { --primary: #1e3a8a; --primary-hover: #172554; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --border: #e2e8f0; --accent: #3b82f6; }
+        body { font-family: 'Inter', Arial, sans-serif; margin: 0; padding: 40px 20px; background: var(--bg); color: var(--text); }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: var(--primary); font-size: 28px; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .card { background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 25px; }
+        .card h3, .card h4 { margin-top: 0; color: var(--primary); font-weight: 600; margin-bottom: 20px; }
+        .auth-container { max-width: 450px; margin: 60px auto; }
+        input, select { box-sizing: border-box; width: 100%; padding: 12px 16px; margin: 8px 0 16px 0; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: #fff; color: var(--text); }
+        input:focus, select:focus { outline: none; border-color: var(--accent); }
+        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        button:hover { background: var(--primary-hover); }
+        .logout-btn { max-width: 200px; background: #ef4444; margin-top: 10px; }
+        .logout-btn:hover { background: #dc2626; }
+        .flex-container { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        @media(min-width: 768px) { .flex-container { grid-template-columns: 1fr 1fr; } }
+        .hidden { display: none; }
+        hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
+        ul { padding: 0; margin: 0; list-style: none; }
+        li { background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border); border-left: 4px solid var(--accent); box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 6px; }
+        .list-btn { background: #f59e0b; color: #0f172a; width: auto; align-self: flex-start; padding: 6px 12px; font-size: 12px; margin-top: 8px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .list-btn:hover { background: #d97706; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 Administrator System Access Tier</h1>
+        
+        <!-- 1. Authentication Card -->
+        <div id="login-card" class="card auth-container">
+            <h3>Portal Admin Authentication</h3>
+            <input type="email" id="email" value="admin@uptm.edu.my">
+            <input type="password" id="password" value="hashed_admin_pass">
+            <button onclick="handleLogin()">Secure Login</button>
+            <p id="auth-feedback" style="color:#ef4444; font-size:14px; margin-top:10px; font-weight:500;"></p>
+        </div>
+
+        <!-- 2. Dashboard Layout -->
+        <div id="dashboard-card" class="card hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <h3 style="margin: 0;">Welcome System Admin: <span id="user-name" style="color: var(--accent);"></span></h3>
+                <button onclick="location.reload()" class="logout-btn">Terminate Session</button>
+            </div>
+            <hr>
+
+            <div class="flex-container">
+                <!-- Left Column: Exams Grid -->
+                <div>
+                    <h4>Schedule a New Examination</h4>
+                    <input type="text" id="courseId" placeholder="Course Code (e.g. SWC3633)">
+                    <input type="date" id="examDate">
+                    <input type="time" id="startTime">
+                    <input type="text" id="venue" placeholder="Venue Location">
+                    <button onclick="createExam()">Commit Schedule Item</button>
+                    
+                    <h4 style="margin-top: 30px;">Current System Exam Timetables</h4>
+                    <ul id="exams-list"></ul>
+                </div>
+
+                <!-- Right Column: User Management -->
+                <div style="border-left: 1px solid var(--border); padding-left: 20px;">
+                    <h4>Edit System User Account</h4>
+                    <input type="number" id="editUserId" placeholder="Target User ID to Edit" readonly style="background: #f1f5f9; cursor: not-allowed;">
+                    <input type="text" id="editName" placeholder="Full Name">
+                    <input type="email" id="editEmail" placeholder="University Email Address">
+                    <select id="editRole">
+                        <option value="Lecturer">Lecturer</option>
+                        <option value="Student">Student</option>
+                    </select>
+                    <button onclick="updateUser()" style="background: #22c55e;">Save Profile Modifications</button>
+                    <button onclick="clearUserForm()" style="background: #64748b; margin-top: 8px;">Clear Selection</button>
+
+                    <h4 style="margin-top: 30px;">Registered Lecturers & Students Directory</h4>
+                    <ul id="users-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIC PIPELINE -->
+    <script>
+        const API_URL = "http://localhost:3000/api"; 
+        let token = "";
+
+        async function handleLogin() {
+            const res = await fetch(`${API_URL}/auth/login`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value }) 
+            });
+            const data = await res.json();
+            if(res.ok && data.user.role === 'Administrator') {
+                token = data.token; 
+                document.getElementById('login-card').classList.add('hidden'); 
+                document.getElementById('dashboard-card').classList.remove('hidden'); 
+                document.getElementById('user-name').innerText = data.user.name; 
+                loadExams();
+                loadUsers();
+            } else { 
+                document.getElementById('auth-feedback').innerText = "Access Denied: Account privilege mismatch."; 
+            }
+        }
+
+        async function loadExams() {
+            const res = await fetch(`${API_URL}/examinations`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json(); 
+            const list = document.getElementById('exams-list'); 
+            list.innerHTML = "";
+            data.forEach(e => { 
+                list.innerHTML += `<li><strong>${e.course_id}</strong><span>📅 Date: ${e.exam_date.split('T')[0]}</span><span>⏰ Time: ${e.start_time} | 📍 Venue: ${e.venue}</span></li>`; 
+            });
+        }
+
+        async function createExam() {
+            const res = await fetch(`${API_URL}/examinations`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                body: JSON.stringify({ course_id: document.getElementById('courseId').value, exam_date: document.getElementById('examDate').value, start_time: document.getElementById('startTime').value, venue: document.getElementById('venue').value }) 
+            });
+            if(res.ok) { alert('Exam Created Successfully!'); loadExams(); } 
+            else { alert('Error creating exam timetable schedule.'); }
+        }
+
+        async function loadUsers() {
+            const res = await fetch(`${API_URL}/users`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            const list = document.getElementById('users-list');
+            list.innerHTML = "";
+            data.forEach(u => {
+                list.innerHTML += `<li>
+                    <span><strong>[ID: ${u.user_id}] ${u.name}</strong> (${u.role})</span>
+                    <span style="font-size:13px; color:#64748b;">📧 ${u.email}</span>
+                    <button class="list-btn" onclick="selectUserForEdit(${u.user_id}, '${u.name.replace(/'/g, "\\'")}', '${u.email}', '${u.role}')">Select to Edit</button>
+                </li>`;
+            });
+        }
+
+        function selectUserForEdit(id, name, email, role) {
+            document.getElementById('editUserId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editRole').value = role;
+        }
+
+        function clearUserForm() {
+            document.getElementById('editUserId').value = "";
+            document.getElementById('editName').value = "";
+            document.getElementById('editEmail').value = "";
+        }
+
+        async function updateUser() {
+            const id = document.getElementById('editUserId').value;
+            if(!id) return alert('Please click "Select to Edit" on a user from the directory below first.');
+
+            const payload = {
+                name: document.getElementById('editName').value,
+                email: document.getElementById('editEmail').value,
+                role: document.getElementById('editRole').value
+            };
+
+            const res = await fetch(`${API_URL}/users/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(payload)
+            });
+
+            if(res.ok) {
+                alert('User Account Updated Successfully!');
+                clearUserForm();
+                loadUsers();
+            } else {
+                const err = await res.json();
+                alert(`Error: ${err.error}`);
+            }
+        }
+    </script>
+</body>
+</html>
+
+
